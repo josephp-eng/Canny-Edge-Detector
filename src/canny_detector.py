@@ -48,17 +48,17 @@ def applyKernel(img, kernel):
                     
     return modImg
 
-def gaussianFilter(img, kernelSize, stdDev):
-    # gaussian kernel
+def gaussianFilter(img, kernelSize, stdDev, name="default"):
+    # Gaussian kernel
     ax = np.linspace(-(kernelSize // 2), kernelSize // 2, kernelSize)
     xx, yy = np.meshgrid(ax, ax)
     gkernel = np.exp(-(xx**2 + yy**2) / (2. * stdDev**2))
 
     gImg = applyKernel(img, gkernel)
 
-    print("Gauss kernel applied")
+    print("Gauss kernel applied to {name}")
 
-    cv2.imwrite(os.path.join(OUTPUT_DIR, "blurred_Image.png"), gImg)
+    cv2.imwrite(os.path.join(OUTPUT_DIR, f"blurred_{name}.png"), gImg)
     plt.imshow(gImg, cmap='gray')
     plt.title("Blurred Image")
     plt.show()
@@ -67,7 +67,7 @@ def gaussianFilter(img, kernelSize, stdDev):
 
     return gImg
 
-def sobel(img):
+def sobel(img, name="default"):
     # SobelX Kernel
     sobelX = np.array([
         [-1, 0, 1],
@@ -85,17 +85,17 @@ def sobel(img):
     # apply Gx and Gy
     Gx = applyKernel(img, sobelX)
     sxImg = Gx
-    cv2.imwrite(os.path.join(OUTPUT_DIR, "sobelX_Image.png"), sxImg)
+    cv2.imwrite(os.path.join(OUTPUT_DIR, f"sobelX_{name}.png"), sxImg)
 
     Gy = applyKernel(img, sobelY)
     syImg  = Gy
-    cv2.imwrite(os.path.join(OUTPUT_DIR, "sobelY_Image.png"), syImg)
+    cv2.imwrite(os.path.join(OUTPUT_DIR, f"sobelY_{name}.png"), syImg)
 
     # magnitude and direction
     magArr = np.sqrt(Gx**2 + Gy**2)
     dirArr = np.arctan2(Gy, Gx)         # radians
 
-    print("Gx and Gy applied")
+    print("Gx and Gy applied to {name}")
     
     plt.subplot(1, 3, 1)
     plt.imshow(sxImg, cmap='gray')
@@ -115,7 +115,7 @@ def sobel(img):
 
     return(magArr, dirArr)
 
-def nonMaxSupress(magArr, dirArr):
+def nonMaxSupress(magArr, dirArr, name="default"):
     h, w = magArr.shape
     output = np.zeros((h,w), dtype=np.float32)      # blank array to apply nonMaxSupress
     angle = np.degrees(dirArr) % 180                # radians to degrees
@@ -160,9 +160,9 @@ def nonMaxSupress(magArr, dirArr):
 
     thinnedImg = output
 
-    print("NMS applied")
+    print("NMS applied to {name}")
     
-    cv2.imwrite(os.path.join(OUTPUT_DIR, "thinned_Image.png"), thinnedImg)
+    cv2.imwrite(os.path.join(OUTPUT_DIR, f"thinned_{name}.png"), thinnedImg)
     plt.imshow(thinnedImg, cmap='gray')
     plt.title("Thinned Image")
     plt.show()  
@@ -171,7 +171,7 @@ def nonMaxSupress(magArr, dirArr):
 
     return(thinnedImg)
 
-def doubleThreshold(img, minRatio, maxRatio):
+def doubleThreshold(img, minRatio, maxRatio, name="default"):
 
     # values below minVal are suppressed, above maxVal are strong line
     # in between are weak lines
@@ -209,9 +209,9 @@ def doubleThreshold(img, minRatio, maxRatio):
 
     cannyImg = edges
 
-    print("Double thresh + Hysteresis complete")
+    print("Double thresh + Hysteresis complete for {name}")
 
-    cv2.imwrite(os.path.join(OUTPUT_DIR, "final_hysteresis.png"), cannyImg)
+    cv2.imwrite(os.path.join(OUTPUT_DIR, f"final_canny_{name}.png"), cannyImg)
     plt.imshow(cannyImg, cmap='gray')
     plt.title("Final Image")
     plt.show()  
@@ -221,8 +221,9 @@ def doubleThreshold(img, minRatio, maxRatio):
     return(cannyImg)
 
 def run_canny_pipeline(filename, k_size, std, low, high, resize_dim=None):
-    """Wraps the logic to handle folder paths and saving automatically."""
     in_path = os.path.join(INPUT_DIR, filename)
+    img_name = os.path.splitext(filename)[0]
+
     print(f"Processing: {filename}...")
     
     grey = load_and_display_image(in_path)
@@ -231,10 +232,11 @@ def run_canny_pipeline(filename, k_size, std, low, high, resize_dim=None):
     if resize_dim:
         grey = cv2.resize(grey, resize_dim)
         
-    blurred = gaussianFilter(grey, k_size, std)
-    mag, dr = sobel(blurred)
-    thinned = nonMaxSupress(mag, dr)
-    final = doubleThreshold(thinned, low, high)
+    blurred = gaussianFilter(grey, k_size, std, name=img_name)
+    mag, dr = sobel(blurred, name=img_name)
+
+    thinned = nonMaxSupress(mag, dr, name=img_name)
+    final = doubleThreshold(thinned, low, high, name=img_name)
     
     # Save to output folder
     out_name = f"canny_{filename}"

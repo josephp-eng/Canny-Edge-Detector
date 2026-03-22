@@ -1,0 +1,18 @@
+# Python 
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDEs
+.vscode/
+.idea/
+*.code-workspace
+
+# Project Specific
+# We ignore the contents of output but keep the folder
+output/*
+!output/.gitkeep
+
+# Operating System
+.DS_Store
+Thumbs.db

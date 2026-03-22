@@ -19,8 +19,8 @@ In my implementation, I utilized `np.meshgrid` to generate the coordinate space 
 
 ### Sobel Gradient
 Using Sobel-X and Sobel-Y kernels to find the intensity gradients.
-* **Magnitude:** $\sqrt{G_x^2 + G_y^2}$
-* **Direction:** $\arctan2(G_y, G_x)$
+* **Magnitude:** $\sqrt{G_x^2 + G_y^2}$ (Represents edge strength)
+* **Direction:** $\arctan2(G_y, G_x)$ (Represents edge orientation)
 
 ### Non-Maximum Suppression (NMS)
 Edges are thinned by comparing a pixel's magnitude to its neighbors along the gradient direction. If the center pixel isn't the local maximum, it is suppressed to zero.
@@ -61,4 +61,4 @@ Different image characteristics require specific tuning. I found that the **High
 ### Pipeline Progression: Sanity Check
 | Original | Gaussian Blur | Sobel Magnitude | Final Canny |
 | :---: | :---: | :---: | :---: |
-| ![Original](../images/sanityCheck.png) | ![Blurred](../output/blurred_sanityCheck.png) | ![Sobel](../output/sobel_mag_sanityCheck.png) | ![Final](../output/final_canny_sanityCheck.png) |
+| ![Original](../images/sanityCheck.png) | ![Blurred](output/blurred_sanityCheck.png) | ![SobelX](output/sobelX_sanityCheck.png) | ![Final](output/final_canny_sanityCheck.png) |

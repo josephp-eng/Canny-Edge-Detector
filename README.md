@@ -13,8 +13,8 @@ This project implements multi-stage Canny Edge Detection of an image in Python w
     <th>Output</th>
   </tr>
   <tr>
-    <td><img src="images/IMG_3964.jpg" alt="Input photo" width="350"></td>
-    <td><img src="output/canny_IMG_3964.jpg" alt="Canny edge detection output" width="350"></td>
+    <td><img src="images/IMG_3964.jpg" alt="Input photo" width="350" height="467"></td>
+    <td><img src="output/canny_IMG_3964.jpg" alt="Canny edge detection output" width="350" height="467"></td>
   </tr>
 </table>
 

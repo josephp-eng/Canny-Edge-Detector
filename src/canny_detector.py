@@ -1,6 +1,6 @@
 # Canny Edge Detector - Intro to Robotics Project
 # Apply Kernels and various filters to extract edges and lines from photos
-# No OpenCV Required!
+# No OpenCV needed for the edge detection!
 # Author: Joey P
 # Date: 4/15/25 (Updated 3/22/26)
 
@@ -53,10 +53,11 @@ def gaussianFilter(img, kernelSize, stdDev, name="default"):
     ax = np.linspace(-(kernelSize // 2), kernelSize // 2, kernelSize)
     xx, yy = np.meshgrid(ax, ax)
     gkernel = np.exp(-(xx**2 + yy**2) / (2. * stdDev**2))
+    gkernel /= gkernel.sum()
 
     gImg = applyKernel(img, gkernel)
 
-    print("Gauss kernel applied to {name}")
+    print(f"Gauss kernel applied to {name}")
 
     cv2.imwrite(os.path.join(OUTPUT_DIR, f"blurred_{name}.png"), gImg)
     plt.imshow(gImg, cmap='gray')
@@ -85,17 +86,22 @@ def sobel(img, name="default"):
     # apply Gx and Gy
     Gx = applyKernel(img, sobelX)
     sxImg = Gx
+    # export Sobel X
     cv2.imwrite(os.path.join(OUTPUT_DIR, f"sobelX_{name}.png"), sxImg)
 
     Gy = applyKernel(img, sobelY)
     syImg  = Gy
+    # export Sobel Y
     cv2.imwrite(os.path.join(OUTPUT_DIR, f"sobelY_{name}.png"), syImg)
 
     # magnitude and direction
     magArr = np.sqrt(Gx**2 + Gy**2)
     dirArr = np.arctan2(Gy, Gx)         # radians
 
-    print("Gx and Gy applied to {name}")
+    # export Sobel Magnitude
+    cv2.imwrite(os.path.join(OUTPUT_DIR, f"sobelMag_{name}.png"), magArr)
+
+    print(f"Gx and Gy applied to {name}")
     
     plt.subplot(1, 3, 1)
     plt.imshow(sxImg, cmap='gray')
@@ -160,7 +166,7 @@ def nonMaxSupress(magArr, dirArr, name="default"):
 
     thinnedImg = output
 
-    print("NMS applied to {name}")
+    print(f"NMS applied to {name}")
     
     cv2.imwrite(os.path.join(OUTPUT_DIR, f"thinned_{name}.png"), thinnedImg)
     plt.imshow(thinnedImg, cmap='gray')
@@ -209,7 +215,7 @@ def doubleThreshold(img, minRatio, maxRatio, name="default"):
 
     cannyImg = edges
 
-    print("Double thresh + Hysteresis complete for {name}")
+    print(f"Double thresh + Hysteresis complete for {name}")
 
     cv2.imwrite(os.path.join(OUTPUT_DIR, f"final_canny_{name}.png"), cannyImg)
     plt.imshow(cannyImg, cmap='gray')

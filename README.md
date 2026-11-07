@@ -5,10 +5,28 @@
 
 **Date:** 4/15/25 (Updated 3/22/26)
 
-This project implements multi-stage Canny Edge Dection of an image in Python without relying on `cv2.Canny()`.
+This project implements multi-stage Canny Edge Detection of an image in Python without relying on `cv2.Canny()`.
 
 ## Implementation
-The pipeline processes raw images through five stages to extract edge structure while suppressing noise.
+The pipeline processes raw images through four stages to extract edge structure while suppressing noise.
+
+```mermaid
+flowchart LR
+    A[Input Image] --> B[Grayscale]
+    B --> C[Gaussian Blur]
+    C --> D[Sobel X / Sobel Y]
+    D --> E[Gradient Magnitude<br/>and Direction]
+    E --> F[Non-Maximum<br/>Suppression]
+    F --> G[Double Threshold]
+    G --> H[Hysteresis]
+    H --> I[Edge Map]
+
+    C -. blurred_*.png .-> O[(output/)]
+    D -. sobelX_*.png / sobelY_*.png .-> O
+    E -. sobelMag_*.png .-> O
+    F -. thinned_*.png .-> O
+    H -. final_canny_*.png .-> O
+```
 
 ### Gaussian Blurring
 To reduce image noise, I applied a Gaussian filter. The weight $G$ at any pixel $(x, y)$ is calculated using the 2D Gaussian distribution:
@@ -34,6 +52,24 @@ Pixels are classified into three categories based on `maxRatio` and `minRatio`:
 3. **Suppressed (0):** Below `lowThresh`.
 
 **Hysteresis:** Weak pixels are only promoted to Strong if they are connected to an existing Strong pixel within 8 adjacent tiles.
+
+## Project Structure
+```
+Canny-Edge-Detector/
+├── images/                 # Input test images
+├── output/                 # Generated images from each pipeline stage
+│   ├── blurred_*.png       #   Gaussian blur
+│   ├── sobelX_*.png        #   Horizontal gradient (Gx)
+│   ├── sobelY_*.png        #   Vertical gradient (Gy)
+│   ├── sobelMag_*.png      #   Gradient magnitude
+│   ├── thinned_*.png       #   Non-maximum suppression
+│   └── final_canny_*.png   #   Final edge map after hysteresis
+├── src/
+│   ├── canny_detector.py   # Full implementation and pipeline runner
+│   └── canny_skeleton.py   # Original skeleton code provided for the project
+├── LICENSE
+└── README.md
+```
 
 ## How to Run
 
@@ -63,4 +99,11 @@ Different image characteristics require specific tuning. I found that the **High
 ### Pipeline Progression: Sanity Check
 | Original | Gaussian Blur | Sobel Magnitude | Final Canny |
 | :---: | :---: | :---: | :---: |
-| ![Original](images/sanityCheck.png) | ![Blurred](output/blurred_sanityCheck.png) | ![SobelX](output/sobelX_sanityCheck.png) | ![Final](output/final_canny_sanityCheck.png) |
+| ![Original](images/sanityCheck.png) | ![Blurred](output/blurred_sanityCheck.png) | ![Sobel Magnitude](output/sobelMag_sanityCheck.png) | ![Final](output/final_canny_sanityCheck.png) |
+
+## Limitations
+* **Performance:** Convolution, NMS, and hysteresis use pixel-by-pixel Python loops, so large images are slow. This is why the Lift Bridge and IMG_3964 inputs are resized before processing. Vectorizing with NumPy slicing would speed this up significantly.
+* **Single-pass hysteresis:** Weak pixels are only checked against their immediate 8 neighbors in one pass. A weak edge connected to a strong edge only through other weak pixels may be dropped. A flood-fill or iterative approach would trace full edge chains.
+* **Quantized gradient direction:** NMS rounds gradient direction to 0°, 45°, 90°, or 135°, which can produce slightly jagged edges on curves. Interpolating between neighbors would give smoother results.
+* **Zero-padded borders:** Kernels pad the image with zeros, which can create false gradients along image edges. Reflect or replicate padding would reduce these artifacts.
+* **Manual tuning:** Kernel size, $\sigma$, and threshold ratios are tuned by hand per image. There is no automatic threshold selection (e.g. based on median intensity or Otsu's method).

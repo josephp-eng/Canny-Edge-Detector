@@ -7,6 +7,17 @@
 
 This project implements multi-stage Canny Edge Detection of an image in Python without relying on `cv2.Canny()`.
 
+<table align="center">
+  <tr>
+    <th>Input</th>
+    <th>Output</th>
+  </tr>
+  <tr>
+    <td><img src="images/IMG_3964.jpg" alt="Input photo" width="350"></td>
+    <td><img src="output/canny_IMG_3964.jpg" alt="Canny edge detection output" width="350"></td>
+  </tr>
+</table>
+
 ## Implementation
 The pipeline processes raw images through four stages to extract edge structure while suppressing noise.
 

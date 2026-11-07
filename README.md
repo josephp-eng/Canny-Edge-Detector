@@ -3,7 +3,7 @@
 
 **Course:** Intro to Robotics (EE2180) | Michigan Technological University
 
-**Date:** 4/15/25 (Updated 3/22/26)
+**Date:** 4/15/25 (Updated 11/7/26)
 
 This project implements multi-stage Canny Edge Detection of an image in Python without relying on `cv2.Canny()`.
 

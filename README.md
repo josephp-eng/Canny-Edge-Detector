@@ -12,20 +12,20 @@ The pipeline processes raw images through four stages to extract edge structure 
 
 ```mermaid
 flowchart LR
-    A[Input Image] --> B[Grayscale]
-    B --> C[Gaussian Blur]
-    C --> D[Sobel X / Sobel Y]
-    D --> E[Gradient Magnitude<br/>and Direction]
-    E --> F[Non-Maximum<br/>Suppression]
-    F --> G[Double Threshold]
-    G --> H[Hysteresis]
-    H --> I[Edge Map]
+    A["Input Image"] --> B["Grayscale"]
+    B --> C["Gaussian Blur"]
+    C --> D["Sobel X / Sobel Y"]
+    D --> E["Gradient Magnitude<br/>and Direction"]
+    E --> F["Non-Maximum<br/>Suppression"]
+    F --> G["Double Threshold"]
+    G --> H["Hysteresis"]
+    H --> I["Edge Map"]
 
-    C -. blurred_*.png .-> O[(output/)]
-    D -. sobelX_*.png / sobelY_*.png .-> O
-    E -. sobelMag_*.png .-> O
-    F -. thinned_*.png .-> O
-    H -. final_canny_*.png .-> O
+    C -.->|"blurred_*.png"| O[("output/")]
+    D -.->|"sobelX_*.png, sobelY_*.png"| O
+    E -.->|"sobelMag_*.png"| O
+    F -.->|"thinned_*.png"| O
+    H -.->|"final_canny_*.png"| O
 ```
 
 ### Gaussian Blurring
